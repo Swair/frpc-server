@@ -16,6 +16,17 @@ frpc特点：
 4、Reactor网络模型
 
 
+5、编译
+make
+
+6、运行
+
+./remote_call_server
+
+
+./remote_call_client
+
+
 
 
 
