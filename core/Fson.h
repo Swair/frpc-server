@@ -114,6 +114,11 @@ class Fson
             return deserializer(fonstr.c_str(), fonstr.size());
         }
 
+        void setMem(const std::string& key, const std::string& v)
+        {
+            data_[key] = v;
+        }
+
         void setStr(const std::string& key, const std::string& v)
         {
             std::string value;
@@ -231,6 +236,11 @@ class Fson
                 memcpy((char*)&ivalue, (char*)&value[1], sizeof(ivalue));
                 printf("<%s, %d>", key.c_str(), ivalue);
             }    
+        }
+
+        void clear()
+        {
+            data_.clear();
         }
 
         void print()

@@ -126,7 +126,7 @@ int nbSafeSend(int fd, char* buf, int len)
             }
             else
             {
-                logWrite("---------no data recv, res = %d\n", res);
+                logWrite("---------no data send, res = %d\n", res);
                 return -1;
             }
             continue;
