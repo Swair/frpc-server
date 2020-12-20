@@ -162,12 +162,23 @@ class Fson
             }
         }
 
+        std::string getMem(const std::string& key)
+        {
+            auto&& item = data_.find(key);
+            if(item == data_.end())
+            {
+                logWrite("getMem error, no %s in Fson\n", key.c_str());
+                throw -1;
+            }
+            return item->second;
+        }
+
         std::string getStr(const std::string& key)
         {
             auto&& item = data_.find(key);
             if(item == data_.end())
             {
-                logWrite("get error, no %s in Fson\n", key.c_str());
+                logWrite("getStr error, no %s in Fson\n", key.c_str());
                 throw -1;
             }
             return item->second.substr(1);
