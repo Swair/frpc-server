@@ -1,35 +1,45 @@
-The writer is swair. if you have questions, please contact me with email: swair_fang@126.com
-
-
-frpc特点：
-
-1、Fson数据通信协议
-
-
-  exp.  { "key1":"value1",  "key23": 123, "wav":0xff0xmm}
-     | 0 1 | 2 3 | 4 5 | 6 7 | 8 9 | 10 11 | 12 13 | 14 15 16 17| 18 |19|20|21|22|23|24|25|26|27|28|29| 30 |31|32|33|34|35|36|37| 38 |39 |40|
-     |  2  |  4  |  7  |  5  |  5  |   3   |  3    | k  e  y  1 | s  |v  a  l  u   e 1 | k  e y  2  3 |int |   123     |w  a  v |byte| ff mm|
-     |kvnum|ksize|vsize|                                        |type|                                |type|                    |type| 
-     |-num-|-------------------head----------------|------------------------------------------body------------------------------------------| 
+blog: https://my.oschina.net/u/4936903
 
 
 
-2、无锁线程池
-3、内存管理
-4、Reactor网络模型
+### 1. Fson协议
+#### 类型标记
+​    byte        0
+​    char        1
+​    short       3
+​    int           4
+​    long         5
+​    double    6
+​    string    10
+​    Fson     99
+
+#### Fson协议格式
+```
+| 0 1 | 2 3 |  4  5 |...|koffset+ksize|valuetype|voffset+vsize|...|...|
+|kvnum|ksize|vsize+1|...|     key     |  vtype  |     value   |...|...|
+```
+
+#### 举例
+```
+   exp.  { "k1":"v1", "k2": 123, "wav":0xff0xmm}
+   |-num-|-------------------head------------------|---------------body-----------------------------------|
+   |kvnum|k1size|v1size|k2size|v2size|k3size|v3size| k1  |type|  v1  |  k2 |type| 123 |   wav  |type| ffmm|
+   | 0 1 | 2 3  | 4 5  | 6  7 | 8  9 | 10 11| 12 13|14 15| 16 | 17 18|19 20|21  |22|23|24|25|26|27  |28|29|
+   |  2  |  2   |  3   |   2  |  3   |  3   |   3  | k 1 | 10 | v  1 | k 2 | 4  | 123 | w  a v |0   |ff mm|
 
 
-5、编译
-make
+```
 
-6、运行
+### 2、无锁线程池
+### 3、内存管理
+### 4、Reactor网络模型
+### 5、编译&运行
 
-./remote_call_server
+​    make
 
+​    ./remote_call_server
 
-./remote_call_client
-
-
+​    ./remote_call_client
 
 
 
