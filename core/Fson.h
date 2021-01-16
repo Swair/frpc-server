@@ -22,7 +22,8 @@ enum FTYPE
     VLONG,
     VDOUBLE,
     VSTRING = 10,
-
+    
+    VFSON = 99,
     VEND = 255
 };
 
@@ -119,6 +120,11 @@ class Fson
             data_[key] = v;
         }
 
+        void setFson(const std::string& key, Fson& fson)
+        {
+            setMem(key, fson.serializer());
+        }
+
         void setStr(const std::string& key, const std::string& v)
         {
             std::string value;
@@ -176,6 +182,13 @@ class Fson
                 throw -1;
             }
             return item->second;
+        }
+
+        Fson getFson(const std::string& key)
+        {
+            Fson fson;
+            fson.deserializer(getMem(key));
+            return fson; 
         }
 
         std::string getStr(const std::string& key)
