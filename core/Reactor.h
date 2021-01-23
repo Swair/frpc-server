@@ -18,7 +18,6 @@ typedef struct
     int sfd;
     int cfd;
     std::function<void(void*)> cb;
-    std::function<int(int cfd)> userCallBack;
 } UEvent;
 
 
@@ -29,7 +28,7 @@ class Reactor
         ~Reactor();
         void epollCtrl(int efd, int ctrl, int fd, int event, const UEvent* uevt);
         void initServer(const char* ip, const char* port);
-        void runEpollServer(const char* ip, const char* port, std::function<int(int)> userCallBack);
+        void runEpollServer(const char* ip, const char* port, std::function<int(int, void*)> userCallBack);
         void accepthandler(const void* args);
         void processhandler(void* args);
         void closehandler(void* args);
@@ -40,7 +39,7 @@ class Reactor
     private: 
         int efd_;
         bool workRun_;
-        std::function<int(int)> userCallBack_;
+        std::function<int(int, void*)> userCallBack_;
         int recvBufSize_;
         std::unique_ptr<ThreadPool> threadPool_;
 };

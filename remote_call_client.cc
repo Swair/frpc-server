@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string>
 #include "Socket.h"
 #include "Common.h"
 #include "LogWrite.h"
@@ -29,6 +30,36 @@ int main(int argc,char*argv[])
     };
 
     nbSendToServer("127.0.0.1", "12345", work);
+
+
+    auto set = [](int sfd)->void{
+        Fson request;
+        request.setStr("method", "set");
+        request.setStr("name", "jack");
+        request.setInt("age", 20);
+        sendRequest(sfd, request);
+
+        Fson response;
+        recvRequest(sfd, response);
+        response.print();
+    };
+
+    nbSendToServer("127.0.0.1", "12345", set);
+
+
+    auto get = [](int sfd)->void{
+        Fson request;
+        request.setStr("method", "get");
+        sendRequest(sfd, request);
+
+        Fson response;
+        recvRequest(sfd, response);
+
+        printf("name = %s, age = %d\n", response.getStr("name").c_str(), response.getInt("age"));
+    };
+
+    nbSendToServer("127.0.0.1", "12345", get);
+
 
     return 0;
 }

@@ -25,7 +25,7 @@ void Reactor::processhandler(void* args)
     UEvent* cevt = (UEvent*)args;
     int efd = cevt->efd;
     int cfd = cevt->cfd;
-    int state = cevt->userCallBack(cfd);
+    int state = userCallBack_(cfd, (void*)0);
     switch(state)
     {
         case SOCKET_CLOSE: 
@@ -85,13 +85,12 @@ void Reactor::accepthandler(const void* args)
         cevt->sfd = 0; 
         cevt->cfd = cfd;
         cevt->cb = std::move(std::bind(&Reactor::processhandler, this, _1));
-        cevt->userCallBack = userCallBack_;
         epollCtrl(efd, EPOLL_CTL_ADD, cfd, EPOLLIN | EPOLLET | EPOLLONESHOT, cevt);
         nbSetnonblocking(cfd); 
     }
 }
 
-void Reactor::runEpollServer(const char* ip, const char* port, std::function<int(int)> userCallBack)
+void Reactor::runEpollServer(const char* ip, const char* port, std::function<int(int, void*)> userCallBack)
 {
     userCallBack_ = userCallBack;
     struct epoll_event events[MAXEVENT];

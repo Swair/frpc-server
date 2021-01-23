@@ -22,7 +22,7 @@ enum FTYPE
     VLONG,
     VDOUBLE,
     VSTRING = 10,
-    
+
     VFSON = 99,
     VEND = 255
 };
@@ -115,14 +115,14 @@ class Fson
             return deserializer(fonstr.c_str(), fonstr.size());
         }
 
-        void setMem(const std::string& key, const std::string& v)
-        {
-            data_[key] = v;
-        }
-
         void setFson(const std::string& key, Fson& fson)
         {
-            setMem(key, fson.serializer());
+            std::string mem = fson.serializer();
+            std::string value;
+            value.resize(1 + mem.size());
+            value[0] = VFSON;
+            memcpy((char*)&value[1], (char*)&mem[0], mem.size());
+            data_[key] = value;
         }
 
         void setStr(const std::string& key, const std::string& v)
@@ -173,22 +173,17 @@ class Fson
             }
         }
 
-        std::string getMem(const std::string& key)
+        Fson getFson(const std::string& key)
         {
             auto&& item = data_.find(key);
             if(item == data_.end())
             {
-                logWrite("getMem error, no %s in Fson\n", key.c_str());
+                logWrite("__getMem error, no %s in Fson\n", key.c_str());
                 throw -1;
             }
-            return item->second;
-        }
-
-        Fson getFson(const std::string& key)
-        {
             Fson fson;
-            fson.deserializer(getMem(key));
-            return fson; 
+            fson.deserializer(item->second.substr(1));
+            return fson;
         }
 
         std::string getStr(const std::string& key)

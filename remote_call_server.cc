@@ -2,6 +2,7 @@
 #include "Reactor.h"
 #include "Common.h"
 #include "LogWrite.h"
+#include "Server.h"
 
 
 int square(int line)
@@ -9,60 +10,70 @@ int square(int line)
     return line * line;
 }
 
-void nbServer(const std::string& ip, const std::string& port)
+class DataBase
 {
-    auto userHandler = [&](int cfd)->int {
-        Fson request;
-        Fson response;
-        response.set("code", 200);
-
-        auto work = [&]()->void{
-            std::string method;
-            int res = 0;
-            try
-            {
-                method = request.getStr("method");
-            }
-            catch(int ret)
-            {
-                res = ret;
-            }
-
-            if(res == 0)
-            {
-                if(0 == method.compare("square"))
-                {
-                    int v = request.getInt("line");
-                    response.setInt("result", v*v);
-                }
-            }
-            else
-                response.setInt("code", 201);
-        };
-
-        int res = recvRequest(cfd, request);
-        if(res <= 0)
-            return SOCKET_EXCEPTION;
-
-        work();
-        res = sendRequest(cfd, response);
-        if(res < 0)
+    public:
+        void set(const std::string& name, const int& age)
         {
-            logWrite("reply fail\n");
+            name_ = name;
+            age_ = age;
         }
 
-        return SOCKET_CLOSE;
-    };
+        void get(std::string& name, int& age)
+        {
+            name = name_;
+            age = age_;
+        }
 
-    Reactor reactor(10);
-    reactor.runEpollServer(ip.c_str(), port.c_str(), userHandler);
+    private:
+        std::string name_;
+        int age_;
+};
+
+void work(Fson& response, Fson& request, void* args)
+{
+    DataBase& dataBase = *(DataBase*)args; 
+    std::string method;
+
+    try
+    {
+        method = request.getStr("method");
+    }
+    catch(int ret)
+    {
+        response.setInt("code", 201);
+        return;
+    }
+
+    response.setInt("code", 200);
+    if(0 == method.compare("square"))
+    {
+        int v = request.getInt("line");
+        response.setInt("result", v*v);
+    }
+    else if(0 == method.compare("set"))
+    {
+        dataBase.set(request.getStr("name"), request.getInt("age"));
+        response.setStr("msg", "ok");
+    }
+    else if(0 == method.compare("get"))
+    {
+        std::string name;
+        int age;
+        dataBase.get(name, age);
+        response.setStr("name", name);
+        response.setInt("age", age);
+    }
 }
 
 int main(int argc,char*argv[])
 {
+    DataBase dataBase;
     std::string ip = "127.0.0.1";
     std::string port = "12345";
-    nbServer(ip, port);
+    Server server;
+    server.setCallBack(work, (void*)&dataBase);
+    server.startRun(ip, port);
     return 0;
 }
 
