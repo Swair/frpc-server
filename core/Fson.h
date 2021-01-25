@@ -178,7 +178,7 @@ class Fson
             auto&& item = data_.find(key);
             if(item == data_.end())
             {
-                logWrite("__getMem error, no %s in Fson\n", key.c_str());
+                logWrite("getFson error, no %s in Fson\n", key.c_str());
                 throw -1;
             }
             Fson fson;

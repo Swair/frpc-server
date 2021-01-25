@@ -16,7 +16,7 @@ class Server
             args_ = args;
         }
 
-        int processHandler(int cfd, void* args)
+        int processHandler(int cfd)
         {
             auto work = [&]()->int {
                 Fson request;
@@ -26,7 +26,7 @@ class Server
                 if(res <= 0)
                     return SOCKET_EXCEPTION;
 
-                cb_(response, request, args);
+                cb_(response, request, args_);
 
                 res = sendRequest(cfd, response);
                 if(res < 0)
@@ -42,7 +42,7 @@ class Server
         void startRun(const std::string& ip, const std::string& port)
         {
             Reactor reactor(10);
-            reactor.runEpollServer(ip.c_str(), port.c_str(), std::bind(&Server::processHandler, this,  _1, args_));
+            reactor.runEpollServer(ip.c_str(), port.c_str(), std::bind(&Server::processHandler, this,  _1));
         }
 
     private:

@@ -25,7 +25,7 @@ void Reactor::processhandler(void* args)
     UEvent* cevt = (UEvent*)args;
     int efd = cevt->efd;
     int cfd = cevt->cfd;
-    int state = userCallBack_(cfd, (void*)0);
+    int state = userCallBack_(cfd);
     switch(state)
     {
         case SOCKET_CLOSE: 
@@ -90,7 +90,7 @@ void Reactor::accepthandler(const void* args)
     }
 }
 
-void Reactor::runEpollServer(const char* ip, const char* port, std::function<int(int, void*)> userCallBack)
+void Reactor::runEpollServer(const char* ip, const char* port, std::function<int(int)> userCallBack)
 {
     userCallBack_ = userCallBack;
     struct epoll_event events[MAXEVENT];
